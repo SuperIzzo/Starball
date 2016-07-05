@@ -23,8 +23,6 @@ namespace Izzo.Physics
 {
     using UnityEngine;
 
-    [AddComponentMenu("Physics/Repulsion-Attraction Force")]
-
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     /// <summary>  Applies a repulsion force at point.   </summary>
     /// <remarks>
@@ -35,6 +33,8 @@ namespace Izzo.Physics
     ///     opposite to its forward direction.
     /// </remarks>
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    [AddComponentMenu( "Physics/Repulsion-Attraction Force" )]
+
     public class RepulsionForce : MonoBehaviour
     {
         //-------------------------------------------------------------
@@ -55,7 +55,7 @@ namespace Izzo.Physics
         ( "Collision layers to include or ignore.\n" +
           "(e.g. magnets only affect certain objects.)"              )]
         //----------------------------------
-        LayerMask _pushAgainst;
+        LayerMask _pushAgainst = -1;
 
         //-------------------------------------------------------------
         [SerializeField, Tooltip
@@ -84,23 +84,42 @@ namespace Izzo.Physics
         {
             RaycastHit hitInfo;
             bool hasHit = Physics.Raycast( transform.position,
-                                       transform.forward,
-                                       out hitInfo,
-                                       _maxDistance,
-                                       _pushAgainst );
+                                           transform.forward,
+                                           out hitInfo,
+                                           _maxDistance,
+                                           _pushAgainst );
             if( hasHit )
             {
-                float distanceFactor = 1 - hitInfo.distance /_maxDistance;
-                float finalForceAmount = _forceAmount * distanceFactor;
+                float finalForceAmount = GetForceAtDistance( hitInfo.distance );
                 Vector3 force = transform.forward * finalForceAmount;
                 rigidBody.AddForceAtPosition( -force, transform.position );
 
                 if( _pushOtherObjects && hitInfo.rigidbody )
                 {
-                    hitInfo.rigidbody.AddForceAtPosition( force, 
+                    hitInfo.rigidbody.AddForceAtPosition( force,
                                                           hitInfo.point );
                 }
             }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary>  Returns the amount of force applied 
+        ///            at a given distance.                  </summary>
+        /// <remarks>
+        ///     Repulsive and attractive forces weaken with
+        ///     distance. A distance of 0 will return the
+        ///     full amount of force and the closer it gets
+        ///     to the max distance, the closer the output 
+        ///     force will be to 0.                          </remarks>
+        /// <param name="distance">  
+        ///     Distance from the force origin.                </param>
+        /// <returns>  The amount of force.                  </returns>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        private float GetForceAtDistance( float distance )
+        {
+            float distanceFactor = 1 - distance /_maxDistance;
+            distanceFactor = Mathf.Clamp01( distanceFactor );
+            return _forceAmount * distanceFactor;
         }
     }
 }

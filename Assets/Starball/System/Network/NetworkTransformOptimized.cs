@@ -25,9 +25,6 @@ namespace Izzo.Networking
     using UnityEngine;
     using UnityEngine.Networking;
 
-    [DisallowMultipleComponent]
-    [AddComponentMenu( "Network/NetworkTransform (Optimized)", 1 )]
-
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     /// <summary>  Synchronizes the game objects movement 
     ///            and rotation over the network.        </summary>
@@ -39,6 +36,9 @@ namespace Izzo.Networking
     ///     doing any physics simulation on their own.
     ///                                                  </remarks>
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    [DisallowMultipleComponent]
+    [AddComponentMenu( "Network/NetworkTransform (Optimized)", 1 )]
+
     public class NetworkTransformOptimized : NetworkBehaviour
     {
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -617,7 +617,7 @@ namespace Izzo.Networking
                     bitMask &= ~currentBit;
                 }
             }
-        }        
+        }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         /// <summary>  Compresses a general scalar value and
@@ -804,6 +804,6 @@ namespace Izzo.Networking
                         break;
                     }
             }
-        }        
+        }
     }
 }

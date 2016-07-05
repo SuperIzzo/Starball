@@ -23,14 +23,14 @@ namespace Izzo.Starball
 {
     using UnityEngine;
 
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    /// <summary>  A gameplay model. Controls the physical
+    ///            movement of a star.                   </summary>
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
     [DisallowMultipleComponent]
     [AddComponentMenu( "Starball/Star/Star Model" )]
     [RequireComponent( typeof( Rigidbody ) )]
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    /// <summary>  A gameplay model. Controls the physical
-    ///            movement of a star.                   </summary>
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     public class StarModel : MonoBehaviour
     {
         //-------------------------------------------------------------	

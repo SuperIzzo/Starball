@@ -24,12 +24,12 @@ namespace Izzo.Starball
     using Utility;
     using UnityEngine;
 
-    [DisallowMultipleComponent]
-    [AddComponentMenu( "Starball/Game/Simple Game Mode" )]
-
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     /// <summary> Handles global game rules.             </summary>
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    [DisallowMultipleComponent]
+    [AddComponentMenu( "Starball/Game/Simple Game Mode" )]
+
     public class SimpleGameMode : MonoBehaviour, IPlayerSpawnListener
     {
         //-------------------------------------------------------------

@@ -27,18 +27,41 @@ namespace Izzo.Utility
     using UnityEditor.Callbacks;
 #endif
 
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    /// <summary>  Replaces itself with a prefab. </summary>
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     [AddComponentMenu( "Miscellaneous/Prefab Reference" )]
+
     public class PrefabReference : MonoBehaviour
     {
-        [SerializeField]
-        private GameObject _prefab;
-        
-        private void Awake()
+        //-------------------------------------------------------------        
+        [SerializeField, Tooltip
+        ( "A link to the prefab that will replace this object."      )]
+        //----------------------------------
+        private GameObject _prefab = null;
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary>  Replaces this object 
+        ///            with a prefab at runtime.             </summary>
+        /// <remarks>  
+        ///     This will get called if the object was instantiated
+        ///     at runtime. All objects that exist in the scene at
+        ///     build time will be replaced by the editor.   </remarks>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        protected void Awake()
         {
             Bake();
         }
 
 #if UNITY_EDITOR
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary>  Replaces this object 
+        ///            with a prefab at build time.          </summary>
+        /// <remarks>  
+        ///     This will get called at the time of building 
+        ///     the player and later at building each scene. </remarks>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        [PostProcessBuild( -2 )]
         [PostProcessScene( -2 )]
         public static void OnPostprocessScene()
         {
@@ -51,7 +74,10 @@ namespace Izzo.Utility
             }
         }
 #endif
-
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary>  Creates a prefab instances, sets it up
+        ///            and destroys this object.             </summary>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         private void Bake()
         {
             GameObject instance = InstantiatePrefab();
@@ -64,6 +90,12 @@ namespace Izzo.Utility
             Destroy( gameObject );
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary>  Moves all child transfroms from this object
+        ///            to another object.                    </summary>
+        /// <param name="instance"> 
+        ///     The object children will be moved to.          </param>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         private void TransferChildren( GameObject instance )
         {
             foreach( Transform child in transform )
@@ -72,6 +104,12 @@ namespace Izzo.Utility
             }
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary>  Sets the parent of this object to also be
+        ///            the parent of another.                </summary>
+        /// <param name="instance"> 
+        ///     The object whose parent will be set.           </param>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         private void SetPrefabParent( GameObject instance )
         {
             if( transform.parent )
@@ -80,10 +118,14 @@ namespace Izzo.Utility
             }
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary>  Instantiates a prefab instance.       </summary>
+        /// <returns>  The new instance from the prefab.     </returns>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         private GameObject InstantiatePrefab()
         {
-            return Entity.Spawn( _prefab, 
-                                 transform.position, 
+            return Entity.Spawn( _prefab,
+                                 transform.position,
                                  transform.rotation );
         }
     }

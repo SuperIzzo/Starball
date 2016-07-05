@@ -40,16 +40,16 @@ namespace Izzo.Utility
         ///     The rotation of the new entity.                </param>
         /// <returns> The new entity.                        </returns>
         //==================================
-        public static GameObject Spawn( GameObject entityType, 
-                                        Vector3 position, 
+        public static GameObject Spawn( GameObject entityType,
+                                        Vector3 position,
                                         Quaternion rotation )
         {
-            var entity = GameObject.Instantiate( entityType, 
-                                                 position, 
+            var entity = GameObject.Instantiate( entityType,
+                                                 position,
                                                  rotation ) as GameObject;
 
             // TODO: Rework, clients can't instantiate network identities
-            if( NetworkServer.active 
+            if( NetworkServer.active
                 && entity.GetComponent<NetworkIdentity>() )
             {
                 NetworkServer.Spawn( entity );

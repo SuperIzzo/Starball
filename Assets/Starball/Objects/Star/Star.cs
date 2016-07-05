@@ -32,7 +32,7 @@ namespace Izzo.Starball
     ///     star sub-systems.                             </design>
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     public class Star
-    {        
+    {
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /// <summary>  A reference to the star game object.  </summary>
         //::::::::::::::::::::::::::::::::::

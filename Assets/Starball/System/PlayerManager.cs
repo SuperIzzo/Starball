@@ -24,8 +24,6 @@ namespace Izzo.Starball
     using UnityEngine;
     using UnityEngine.Networking;
 
-    [AddComponentMenu( "Starball/Player/Player Manager" )]
-
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     ///<summary>  An utility class that handles players. </summary>
     ///<design>
@@ -35,6 +33,8 @@ namespace Izzo.Starball
     ///     To facilitate this, do not add non-static 
     ///     public methods or properties.                 </design>
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    [AddComponentMenu( "Starball/Player/Player Manager" )]
+
     public class PlayerManager : NetworkBehaviour
     {
         private SyncListUInt _playerNetIDs = new SyncListUInt();

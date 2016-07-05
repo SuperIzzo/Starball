@@ -24,11 +24,11 @@ namespace Izzo.Starball
     using UnityEngine;
     using UnityEngine.Networking;
 
-    [AddComponentMenu( "Starball/Player/Star Controller" )]
-
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     /// <summary>  A player controller of star objects.  </summary>
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+    [AddComponentMenu( "Starball/Player/Star Controller" )]
+
     public class PlayerStarController : NetworkBehaviour
     {
         //-------------------------------------------------------------

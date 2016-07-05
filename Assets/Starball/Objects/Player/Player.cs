@@ -61,7 +61,7 @@ namespace Izzo.Starball
         public Star star
         {
             get { return starController ? starController.star : null; }
-            set { if( starController ) starController.star = value;   }
+            set { if( starController ) starController.star = value; }
         }
 
         //.............................................................

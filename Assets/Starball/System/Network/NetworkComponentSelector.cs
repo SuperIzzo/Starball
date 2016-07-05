@@ -25,8 +25,6 @@ namespace Izzo.Networking
     using System.Collections;
     using UnityEngine.Networking;
 
-    [AddComponentMenu( "Network/NetworkComponentSelector" )]
-
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     /// <summary>  Removes components based on whether the game
     ///            starts as a client or a server.       </summary>
@@ -36,19 +34,21 @@ namespace Izzo.Networking
     ///     Hosts keep everything.
     /// </remarks>
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    [AddComponentMenu( "Network/NetworkComponentSelector" )]
+
     public class NetworkComponentSelector : NetworkBehaviour
     {
         //-------------------------------------------------------------
         [SerializeField, Tooltip
         ( "A list of components that only clients should have. "     )]
         //----------------------------------        
-        private Component[] _clientOnlyComponents;
+        private Component[] _clientOnlyComponents = null;
 
         //-------------------------------------------------------------
         [SerializeField, Tooltip
         ( "A list of components that only servers should have. "     )]
         //----------------------------------
-        private Component[] _serverOnlyComponents;
+        private Component[] _serverOnlyComponents = null;
 
         //=============================================================
         /// <summary> Removes client-only components if the server
