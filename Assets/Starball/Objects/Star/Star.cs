@@ -21,6 +21,7 @@
 \*+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + */
 namespace Izzo.Starball
 {
+    using System;
     using UnityEngine;
     using UnityEngine.Networking;
 
@@ -28,15 +29,31 @@ namespace Izzo.Starball
     /// <summary>  A representation of a Star object.    </summary>
     /// <design>
     ///     Star is an immutable facade class with a value 
-    ///     'gameObject' and provides an interface to the 
-    ///     star sub-systems.                             </design>
+    ///     'networkIdentity' and provides an interface 
+    ///     to the star sub-systems.                      </design>
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     public class Star
     {
-        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //.............................................................
         /// <summary>  A reference to the star game object.  </summary>
-        //::::::::::::::::::::::::::::::::::
-        public GameObject gameObject { get; private set; }
+        //..................................
+        private GameObject gameObject { get; set; }
+
+        //.............................................................
+        /// <summary>  A reference to the StarModel.         </summary>
+        //..................................
+        private StarModel model
+        {
+            get
+            {
+                if( !_model )
+                {
+                    _model = gameObject.GetComponent<StarModel>();
+                }
+                return _model;
+            }
+        }
+        private StarModel _model=null;
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /// <summary>  A reference to the 
@@ -57,20 +74,12 @@ namespace Izzo.Starball
         private NetworkIdentity _networkIdentity=null;
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /// <summary>  A reference to the StarModel.         </summary>
-        //::::::::::::::::::::::::::::::::::
-        public StarModel model
+        /// <summary>  Gets whether this Star can be controlled. </summary>
+        //::::::::::::::::::::::::::::::::::    
+        public bool isControllable
         {
-            get
-            {
-                if( !_model )
-                {
-                    _model = gameObject.GetComponent<StarModel>();
-                }
-                return _model;
-            }
-        }
-        private StarModel _model=null;
+            get { return model != null && model.isActiveAndEnabled; }
+        }        
 
         //=============================================================
         /// <summary>  Constructs a new star.                </summary>
@@ -80,6 +89,44 @@ namespace Izzo.Starball
         public Star( GameObject starGameObject )
         {
             gameObject = starGameObject;
+        }
+
+        //=============================================================
+        /// <summary>  Moves the star in the given direction.</summary>
+        /// <param name="movementInput"> 
+        ///     The direction and amount of movement.          </param>
+        //==================================
+        public void Move( Vector2 movementInput )
+        {
+            if( isControllable )
+            {
+                model.Move( movementInput );
+            }
+            else
+            {
+                Debug.LogError( "Attempting to command a non-controllable " +
+                                "Star to move. Use `isControllable` to test " +
+                                "whether the star can be moved." );
+            }
+        }
+
+        //=============================================================
+        /// <summary>  Spins the star in the given direction.</summary>
+        /// <param name="spin">
+        ///     The direction and amount of spin.              </param>
+        //==================================
+        public void Spin( float spin )
+        {
+            if( isControllable )
+            {
+                model.Spin( spin );
+            }
+            else
+            {
+                Debug.LogError( "Attempting to command a non-controllable " +
+                                "Star to spin. Use `isControllable` to test " +
+                                "whether the star can be spun." );
+            }
         }
     }
 }

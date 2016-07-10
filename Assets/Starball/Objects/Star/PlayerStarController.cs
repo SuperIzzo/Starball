@@ -32,7 +32,7 @@ namespace Izzo.Starball
     public class PlayerStarController : NetworkBehaviour
     {
         //-------------------------------------------------------------
-        [SyncVar, SerializeField, Tooltip
+        [SyncVar(hook="SyncVarStar"), SerializeField, Tooltip
         ( "The star this controller controls."                       )]
         //----------------------------------
         private NetworkIdentity _star;
@@ -85,50 +85,30 @@ namespace Izzo.Starball
         //-------------------------------------------------------------
         /// <summary>  Internal dispach time counter.        </summary>
         //----------------------------------
-        private float _dispatchTimer;
-
-        //-------------------------------------------------------------	
-        /// <summary>  Internal property value holder.       </summary>
-        //----------------------------------
-        private Star _starCache;
+        private float _dispatchTimer;        
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /// <summary>  A reference to the star game object.  </summary>
         //::::::::::::::::::::::::::::::::::
         public Star star
         {
-            // TODO: Ugly and error-prone
             get
             {
-                if( _star == null )
-                {
-                    _starCache = null;
-                }
-                else if( _starCache == null
-                      || _starCache.gameObject == null )
+                if( _starCache == null && _star != null)
                 {
                     _starCache = new Star( _star.gameObject );
                 }
                 return _starCache;
             }
 
+            [Server]
             set
             {
-                if( value != _starCache )
-                {
-                    if( value == null )
-                    {
-                        _star = null;
-                        _starCache = null;
-                    }
-                    else
-                    {
-                        _star = value.networkIdentity;
-                        _starCache = value;
-                    }
-                }
+                _starCache = value;
+                _star = value.networkIdentity;
             }
         }
+        private Star _starCache;
 
         //.............................................................
         /// <summary>  Gets the averaged movement input.     </summary>
@@ -298,6 +278,17 @@ namespace Izzo.Starball
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary>  SyncVar hook for star.                </summary>
+        /// <param name="star"></param>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        [Client]
+        private void SyncVarStar( NetworkIdentity star )
+        {
+            _star = star;
+            _starCache = new Star( star.gameObject );
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         /// <summary>  Executes the movement and spin input
         ///            on the server.                        </summary>
         /// <param name="movementInput"> 
@@ -308,10 +299,10 @@ namespace Izzo.Starball
         [Command]
         private void CmdControl( Vector2 movementInput, float spinInput )
         {
-            if( star != null && star.model )
+            if( star != null )
             {
-                star.model.Move( movementInput );
-                star.model.Spin( spinInput );
+                star.Move( movementInput );
+                star.Spin( spinInput );
             }
         }
     }
