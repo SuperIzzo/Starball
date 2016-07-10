@@ -12,7 +12,7 @@ TextureImporter:
     correctGamma: 0
     fadeOut: 1
     borderMipMap: 0
-    mipMapFadeDistanceStart: 3
+    mipMapFadeDistanceStart: 4
     mipMapFadeDistanceEnd: 8
   bumpmap:
     convertToNormalMap: 1
