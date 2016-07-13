@@ -6,7 +6,7 @@
     public class VRManager : MonoBehaviour
     {
         private IVRDevice[] vrDevices;
-        private IVRDevice activeVRDevice;        
+        private IVRDevice activeVRDevice;
 
         // Use this for initialization
         void Start()
@@ -25,7 +25,7 @@
         // Update is called once per frame
         void Update()
         {
-            if( activeVRDevice!=null )
+            if( activeVRDevice != null )
             {
                 activeVRDevice.Update();
                 activeVRDevice.UpdateCamera( Camera.main );
@@ -39,7 +39,11 @@
             while( true )
             {
                 yield return endOfFrame;
-                activeVRDevice.DrawFrame();
+
+                if( activeVRDevice != null && activeVRDevice.enabled )
+                {
+                    activeVRDevice.DrawFrame();
+                }
             }
         }
 
