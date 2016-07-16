@@ -31,6 +31,8 @@ namespace Izzo.VR
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     public class VRDeviceSimpleSplitScreenImpl : IVRDevice
     {
+        private const string splitScreenVRDeviceName = "split";
+
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         ///  <inheritdoc/>
         //::::::::::::::::::::::::::::::::::
@@ -58,7 +60,7 @@ namespace Izzo.VR
                     _enabled = false;
                 }
             }
-        }
+        }        
         private bool _enabled;
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -82,14 +84,7 @@ namespace Izzo.VR
         {
             get
             {
-                if( VRSettings.loadedDevice == VRDeviceType.Split )
-                {
-                    return VRDevice.family;
-                }
-                else
-                {
-                    return "";
-                }
+                return splitScreenVRDeviceName;
             }
         }
 
@@ -100,7 +95,7 @@ namespace Izzo.VR
         {
             get
             {
-                if( VRSettings.loadedDevice == VRDeviceType.Split )
+                if( VRSettings.loadedDeviceName == splitScreenVRDeviceName )
                 {
                     return VRDevice.model;
                 }
@@ -153,7 +148,7 @@ namespace Izzo.VR
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         protected virtual bool OnEnable()
         {
-            VRSettings.loadedDevice = VRDeviceType.Split;
+            VRSettings.LoadDeviceByName( splitScreenVRDeviceName );
             VRSettings.enabled = true;
 
             return true;
@@ -165,7 +160,7 @@ namespace Izzo.VR
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         protected virtual void OnDisable()
         {
-            if( VRSettings.loadedDevice == VRDeviceType.Split )
+            if( VRSettings.loadedDeviceName == splitScreenVRDeviceName )
             {
                 VRSettings.enabled = false;
             }

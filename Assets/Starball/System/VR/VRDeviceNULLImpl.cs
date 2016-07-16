@@ -16,7 +16,7 @@
             {
                 if( value )
                 {
-                    VRSettings.loadedDevice = VRDeviceType.None;
+                    VRSettings.LoadDeviceByName( family );
                 }
             }
         }        
