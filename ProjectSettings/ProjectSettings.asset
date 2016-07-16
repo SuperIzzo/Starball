@@ -527,8 +527,11 @@ PlayerSettings:
   PSP2::VR::enabledDevices: []
   SamsungTV::VR::enabledDevices: []
   Standalone::VR::enabledDevices:
-  - Oculus
   - split
+  - None
+  - Oculus
+  - OpenVR
+  - stereo
   Tizen::VR::enabledDevices: []
   WebGL::VR::enabledDevices: []
   WebPlayer::VR::enabledDevices: []
