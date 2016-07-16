@@ -5,21 +5,32 @@
 
     public class VRManager : MonoBehaviour
     {
+        [SerializeField]
+        private string vrDevice;
+
         private IVRDevice[] vrDevices;
         private IVRDevice activeVRDevice;
 
         // Use this for initialization
         void Start()
         {
-            activeVRDevice = new VRDeviceTrinusImpl();
+            activeVRDevice = GetDeviceForName(vrDevice);
             activeVRDevice.enabled = true;
+
+            foreach( string dev in UnityEngine.VR.VRSettings.supportedDevices )
+            {
+                Debug.Log( dev );
+            }
 
             StartCoroutine( Stream() );
         }
 
         public void OnDestroy()
         {
-            activeVRDevice.enabled = false;
+            if( activeVRDevice != null )
+            {
+                activeVRDevice.enabled = false;
+            }
         }
 
         // Update is called once per frame
@@ -47,10 +58,24 @@
             }
         }
 
+        private IVRDevice GetDeviceForName( string deviceName )
+        {
+            IVRDevice[] devices = GetRegisteredDevices();
+            foreach( IVRDevice device in devices )
+            {
+                if( device.family == deviceName )
+                {
+                    return device;
+                }
+            }
+            return null;
+        }
+
         private static IVRDevice[] GetRegisteredDevices()
         {
             return new IVRDevice[]
             {
+                new VRDeviceNULLImpl(),
                 new VRDeviceSimpleSplitScreenImpl(),
                 new VRDeviceTrinusImpl()
             };

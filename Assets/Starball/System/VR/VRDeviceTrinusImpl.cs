@@ -29,8 +29,14 @@ using UnityEngine;
 
 namespace Izzo.VR
 {
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    /// <summary>  Trinus VR plugin implementation.      </summary>
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     public class VRDeviceTrinusImpl : VRDeviceSimpleSplitScreenImpl
     {
+        private const int maxBufferHeight = 720;
+        private const int maxScreenHeight = 1080;
+
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /// <summary>  true if Trinus is supported on the 
         ///            current platfotm; false otherwise.    </summary>
@@ -52,10 +58,10 @@ namespace Izzo.VR
                 if( trinusManager != null &&
                     trinusManager.getStatus() == DataStructs.STATUS.STREAMING )
                 {
-                    SetGameResolution( deviceScreenHeight );
+                    SetGameResolution( screenBufferHeight );
                 }
             }
-        }        
+        }
         private float _renderScale = 1;
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -101,15 +107,62 @@ namespace Izzo.VR
         }
 
         //.............................................................
-        /// <summary>Gets the screen height on the VR device.</summary>
+        /// <summary> Gets the screen width of the VR device.</summary>
         //..................................
-        private int deviceScreenHeight
+        private int deviceScreenWidth
         {
             get
             {
-                DataStructs.DEVICE deviceInfo = trinusManager.getDeviceInfo ();
-                int targetHeight = Mathf.Min( deviceInfo.height, Screen.height );
-                targetHeight = Mathf.Min( 720, targetHeight );
+                if( trinusManager != null )
+                {
+                    return trinusManager.getDeviceInfo().width;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
+        //.............................................................
+        /// <summary>Gets the screen height of the VR device.</summary>
+        //..................................
+        private int deviceScreenHeigh
+        {
+            get
+            {
+                if( trinusManager != null )
+                {
+                    return trinusManager.getDeviceInfo().height;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
+        //.............................................................
+        /// <summary>  Gets the screen aspect ration 
+        ///            of the VR device.                     </summary>
+        //..................................
+        private float deviceScreenAspect
+        {
+            get
+            {
+                return deviceScreenWidth / (float) deviceScreenHeigh;
+            }
+        }
+
+        //.............................................................
+        /// <summary> Gets the screen buffer height. </summary>
+        //..................................
+        private int screenBufferHeight
+        {
+            get
+            {
+                int targetHeight = Mathf.Min( deviceScreenHeigh, Screen.height );
+                targetHeight = Mathf.Min( maxBufferHeight, targetHeight );
                 return targetHeight;
             }
         }
@@ -117,7 +170,7 @@ namespace Izzo.VR
         //-------------------------------------------------------------
         /// <summary>  A unique trinus project id.           </summary>
         //----------------------------------
-        private string projectID;
+        private string projectID = "Starball";
 
         //-------------------------------------------------------------
         /// <summary> Internal trinus plugin manager reference. </summary>
@@ -146,7 +199,19 @@ namespace Izzo.VR
         /// <summary>  The portion of the screen sent to the 
         ///            VR device when streaming.              </summary>
         //----------------------------------
-        private Rect screenRect = new Rect();
+        private Rect screenBufferRect = new Rect();
+
+        //-------------------------------------------------------------
+        /// <summary>  The previous screen width for which the
+        ///            VR screen buffer was sized.           </summary>
+        //----------------------------------
+        private int lastScreenWidth;
+
+        //-------------------------------------------------------------
+        /// <summary>  The previous screen height for which the
+        ///            VR screen buffer was sized.           </summary>
+        //----------------------------------
+        private int lastScreenHeight;
 
 #if USE_SYS_DRAW
         //-------------------------------------------------------------
@@ -192,26 +257,27 @@ namespace Izzo.VR
         {
             if( trinusManager.getStatus() == DataStructs.STATUS.STREAMING )
             {
-                if( screenRect.width != Screen.width || 
-                    screenRect.height != Screen.height )
+                if( lastScreenWidth != Screen.width ||
+                    lastScreenHeight != Screen.height )
                 {
-                    SetVRDeviceResolution( Screen.width, Screen.height );
+                    SetBufferResolution( Screen.width, Screen.height );
                 }
 
                 lock( this )
                 {
                     if( screenBuffer != null && trinusManager.isReadyForFrame() )
                     {
-                        screenBuffer.ReadPixels( screenRect, 0, 0, false );
+                        screenBuffer.ReadPixels( screenBufferRect, 0, 0, false );
 #if USE_SYS_DRAW
                         byte[] bytes = screenBuffer.GetRawTextureData();
 
                         trinusManager.sendNextFrame( bytes,
-                            (int) screenRect.width,
-                            (int) screenRect.height,
-                            (int) (renderQuality*100) );
+                            (int) screenBufferRect.width,
+                            (int) screenBufferRect.height,
+                            (int) (renderQuality * 100) );
 #else
-                        byte[] bytes = output.EncodeToJPG( 100 );
+                        byte[] bytes = screenBuffer.EncodeToJPG(
+                            (int) renderQuality*100 );
                         trinusManager.sendNextFrame( bytes );
 #endif
                     }
@@ -235,6 +301,8 @@ namespace Izzo.VR
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         protected override bool OnEnable()
         {
+            base.OnEnable();
+
             if( trinusManager == null )
             {
                 trinusManager = new corelib.Manager( projectID );
@@ -331,7 +399,7 @@ namespace Izzo.VR
             settings.fake3DMode = DataStructs.Fake3DMode.DISABLED;
             settings.videoPort = 7777;
             settings.sensorPort = 5555;
-            settings.videoQuality = (int) (renderQuality*100);
+            settings.videoQuality = (int) (renderQuality * 100);
 #if USE_SYS_DRAW
             settings.convertImage = true;
 #endif
@@ -384,34 +452,45 @@ namespace Izzo.VR
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         private void StartStreaming()
         {
-            SetGameResolution( deviceScreenHeight );
-
-            base.OnEnable();
-
+            SetGameResolution( screenBufferHeight );
             trinusManager.startStreaming();
-            SetVRDeviceResolution( Screen.width, Screen.height );
-        }   
+            SetBufferResolution( Screen.width, Screen.height );
+        }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
         /// <summary> Changes the VR device resolution.      </summary>
         /// <remarks>
         ///     This method should be called whenever there's a 
         ///     resolution change (and trinus is streaming). </remarks>
-        /// <param name="width"> The new viewport width.       </param>
-        /// <param name="height"> The new viewport height.     </param>
+        /// <param name="screenWidth"> 
+        ///     The new viewport width.                        </param>
+        /// <param name="screenHeight"> 
+        ///     The new viewport height.                       </param>
         /// <param name="fake3D"> 
         ///     Whether to draw true stereoscopic image or 
         ///     emulate it from a mono camera render.          </param>
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        private void SetVRDeviceResolution(
-            int width,
-            int height,
+        private void SetBufferResolution(
+            int screenWidth,
+            int screenHeight,
             DataStructs.Fake3DMode fake3D = DataStructs.Fake3DMode.DISABLED )
         {
             if( trinusManager != null )
             {
-                trinusManager.resetView( width, height, fake3D );
+                // cache the screen resolution, 
+                // to that we know when it changes
+                lastScreenWidth = screenWidth;
+                lastScreenHeight = screenHeight;
 
+                screenBufferRect =
+                    GetIdealBufferSize( screenWidth, screenHeight );
+
+                int bufferWidth =  (int) screenBufferRect.width;
+                int bufferHeight = (int) screenBufferRect.height;
+
+                trinusManager.resetView( bufferWidth,
+                                         bufferHeight,
+                                         fake3D );
                 lock( this )
                 {
                     if( screenBuffer != null )
@@ -419,44 +498,82 @@ namespace Izzo.VR
                         Object.Destroy( screenBuffer );
                         screenBuffer = null;
                     }
-
-                    screenRect.x = 0;
-                    screenRect.y = 0;
-                    screenRect.width = width;
-                    screenRect.height = height;
 #if USE_SYS_DRAW
-                    //adjusting width to avoid stride padding in bitmap
-                    width = Mathf.FloorToInt( width * 3f / 4f ) / 3 * 4;
-
                     if( bitmap != null )
                     {
                         bitmap.Dispose();
                     }
 
                     bitmap = new System.Drawing.Bitmap(
-                        width,
-                        height,
+                        bufferWidth,
+                        bufferHeight,
                         System.Drawing.Imaging.PixelFormat.Format24bppRgb );
 #endif
                     screenBuffer = new Texture2D(
-                        width,
-                        height,
+                        bufferWidth,
+                        bufferHeight,
                         TextureFormat.RGB24,
                         false );
                     screenBuffer.filterMode = FilterMode.Trilinear;
                 }
             }
 #if DEBUG
-            Debug.Log( "Stream resolution set to " + Screen.width + "x" + Screen.height );
+            Debug.Log( "Stream resolution set to " +
+                (int) screenBufferRect.width + "x" +
+                (int) screenBufferRect.height );
 #endif
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary>  Returns the ideal buffer screen area that
+        ///            preserves the VR screen aspect ratio. </summary>
+        /// <remarks>
+        ///     When the game runs in windowed mode the window size
+        ///     will automatically be set to a resoultion that fits
+        ///     the aspect ratio of the HMD screen.
+        /// </remarks>
+        /// <param name="screenWidth">
+        ///     The game screen width (desktop).               </param>
+        /// <param name="screenHeight"></param>
+        ///     The game screen height (desktop).              </param>
+        /// <returns> 
+        ///     The buffer size that fits the best 
+        ///     in the game window.                          </returns>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        private Rect GetIdealBufferSize( int screenWidth, int screenHeight )
+        {
+            float bufferX = 0;
+            float bufferY = 0;
+            float bufferWidth = screenWidth;
+            float bufferHeight = screenHeight;
+
+            float gameScreenAspect = screenWidth / (float) screenHeight;
+
+            // VR device is wider than the desktop
+            if( deviceScreenAspect > gameScreenAspect )
+            {
+                bufferWidth = screenWidth;
+                bufferHeight = bufferWidth / deviceScreenAspect;
+                bufferX = 0;
+                bufferY = (screenHeight - bufferHeight) / 2;
+            }
+            // VR device is taller than the desktop
+            else if( deviceScreenAspect < gameScreenAspect )
+            {
+                bufferHeight = screenHeight;
+                bufferWidth = bufferWidth * deviceScreenAspect;
+                bufferX = (screenWidth - bufferWidth) / 2;
+                bufferY = 0;
+            }
+
+            return new Rect( bufferX, bufferY, bufferWidth, bufferHeight );
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         /// <summary>  Sets the game screen resolution.      </summary>
         /// <remarks>
-        ///     For best results the resolution aspect is set 
-        ///     to 16:9, and due to limitation the height on the 
-        ///     VR device is capped to 1080p.
+        ///     The resolution is set to the aspect ratio of the 
+        ///     HMD if possible and (for now) is capped at 1080p.
         ///     When the game is played in windowed mode, the
         ///     game resolution can be set to arbitrary height,
         ///     in fullscreen, the closest supported resolution
@@ -467,36 +584,20 @@ namespace Izzo.VR
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         private void SetGameResolution( int height )
         {
-            int resHeight = (int) Mathf.Min(1080, height * renderScale);
-            int resWidth = (int) (resHeight * (16 / 9f));
+            int resHeight = 
+                (int) Mathf.Min( height * renderScale, maxScreenHeight );
+            int resWidth =  (int) (resHeight * deviceScreenAspect);
 
             if( Screen.fullScreen )
             {
-                Resolution[] resolutions = GetValidGameResolutions();
-                Resolution selected = new Resolution();
-
-                int idealResArea = resWidth * resHeight;
-                int lowestAreaDifference = int.MaxValue;
-
-                foreach( Resolution resolution in resolutions )
-                {
-                    int currentResArea = resolution.width * resolution.height;
-                    int areaDifference =
-                        Mathf.Abs( currentResArea - idealResArea );
-
-                    if( areaDifference < lowestAreaDifference )
-                    {
-                        lowestAreaDifference = areaDifference;
-                        selected = resolution;
-                    }
-                }
+                Resolution selected = 
+                    FindClosestScreenResolution(resWidth, resHeight);
 
                 if( selected.width != 0 )
                 {
                     resWidth = selected.width;
                     resHeight = selected.height;
                 }
-
             }
 
             if( Screen.width != resWidth || Screen.height != resHeight )
@@ -504,29 +605,51 @@ namespace Izzo.VR
                 Screen.SetResolution( resWidth, resHeight, Screen.fullScreen );
             }
 
-            SetVRDeviceResolution( Screen.width, Screen.height );
+            SetBufferResolution( Screen.width, Screen.height );
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
         /// <summary> Returns a list of supported resolutions 
         ///           on the game host device.               </summary>
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        private static Resolution[] GetValidGameResolutions()
+        private static Resolution FindClosestScreenResolution( 
+            int idealWidth, 
+            int idealHeight )
         {
-            Resolution[] res = Screen.resolutions;
-            LinkedList<Resolution> vRes = new LinkedList<Resolution> ();
-            foreach( Resolution r in res )
+            const float areaWeight = 0.000001f;
+            const float aspectWeight = 1;
+
+            Resolution closestResolution = new Resolution();
+
+            int idealResArea = idealWidth * idealHeight;
+            float idealAspect = (float) idealWidth/idealHeight;
+            float bestHeuristicScore = float.PositiveInfinity;
+
+            foreach( Resolution resolution in Screen.resolutions )
             {
-                if( (float) r.width / r.height > 1.6 )//widescreen only
+                int resolutionArea = 
+                    resolution.width * resolution.height;
+
+                float resolutionAspect = 
+                    (float) resolution.width / resolution.height;
+
+                int areaDifference =
+                    Mathf.Abs( resolutionArea - idealResArea );
+
+                float aspectDifference =
+                    Mathf.Abs( resolutionAspect - idealAspect );
+
+                float heuristicScore = areaDifference * areaWeight;
+                heuristicScore += aspectDifference * aspectWeight;
+
+                if( heuristicScore < bestHeuristicScore )
                 {
-                    vRes.AddFirst( r );
+                    bestHeuristicScore = heuristicScore;
+                    closestResolution = resolution;
                 }
             }
 
-            Resolution[] result = new Resolution[vRes.Count];
-            vRes.CopyTo( result, 0 );
-
-            return result;
+            return closestResolution;
         }
     }
 }
