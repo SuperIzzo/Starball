@@ -8,11 +8,21 @@
         [SerializeField]
         private string vrDevice;
 
-        private IVRDevice[] vrDevices;
-        private IVRDevice activeVRDevice;
+        public static bool isVREnabled
+        {
+            get
+            {
+                return (activeVRDevice != null) 
+                    && activeVRDevice.family != "None"
+                    && activeVRDevice.enabled;
+            }
+        }
 
-        // Use this for initialization
-        void Start()
+
+        private static IVRDevice[] vrDevices;
+        private static IVRDevice activeVRDevice;
+
+        private void Start()
         {
             activeVRDevice = GetDeviceForName(vrDevice);
             activeVRDevice.enabled = true;
@@ -33,8 +43,7 @@
             }
         }
 
-        // Update is called once per frame
-        void Update()
+        private void Update()
         {
             if( activeVRDevice != null )
             {
@@ -43,7 +52,7 @@
             }
         }
 
-        IEnumerator Stream()
+        private IEnumerator Stream()
         {
             WaitForEndOfFrame endOfFrame = new WaitForEndOfFrame();
 
