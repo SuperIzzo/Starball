@@ -23,6 +23,7 @@ namespace Izzo.Starball
 {
     using UnityEngine;
     using UnityEngine.Networking;
+    using Izzo.Input;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     /// <summary>  A player controller of star objects.  </summary>
@@ -193,12 +194,12 @@ namespace Izzo.Starball
         [Client]
         private void HandleLocalPlayerInput()
         {
-            float x = Input.GetAxis("Horizontal");
-            float y = Input.GetAxis("Vertical");
+            float x = InputManager.GetAxis("Horizontal");
+            float y = InputManager.GetAxis("Vertical");
             AddToMovementInputBuffer( x, y );
 
-            float s = Input.GetAxis("Spin");
-            AddToSpinBuffer( s );
+            float spin = InputManager.GetAxis("Spin");
+            AddToSpinBuffer( spin );
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
