@@ -24,49 +24,49 @@ namespace Izzo.Networking
     using UnityEngine;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    /// <summary>  Removes components based on whether the game
+    /// <summary>  Removes game objects based on whether the game
     ///            starts as a client or a server.       </summary>
     /// <remarks>
-    ///     Clients remove all server components; 
-    ///     Servers remove all client components;
+    ///     Clients remove all server game objects; 
+    ///     Servers remove all client game objects;
     ///     Hosts keep everything.
     /// </remarks>
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [AddComponentMenu( "Network/NetworkComponentSelector" )]
+    [AddComponentMenu( "Network/NetworkObjectSelector" )]
 
-    public class NetworkComponentSelector : NetworkStripper
+    public class NetworkGameObjectSelector : NetworkStripper
     {
         //-------------------------------------------------------------
         [SerializeField, Tooltip
-        ( "A list of components that only clients should have. "     )]
+        ( "A list of objects that only clients should have. "        )]
         //----------------------------------        
-        private Component[] _clientOnlyComponents = null;
+        private GameObject[] _clientOnlyObjects = null;
 
         //-------------------------------------------------------------
         [SerializeField, Tooltip
-        ( "A list of components that only servers should have. "     )]
+        ( "A list of objects that only servers should have. "        )]
         //----------------------------------
-        private Component[] _serverOnlyComponents = null;
+        private GameObject[] _serverOnlyObjects = null;
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        /// <summary> Removes server-only components.        </summary>
+        /// <summary> Removes server-only game objects.      </summary>
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         protected override void StripClient()
         {
-            foreach( Component serverComponent in _serverOnlyComponents )
+            foreach( GameObject serverObject in _serverOnlyObjects )
             {
-                Destroy( serverComponent );
+                Destroy( serverObject );
             }
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        /// <summary> Removes client-only components.        </summary>
+        /// <summary> Removes client-only game objects.      </summary>
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         protected override void StripServer()
         {
-            foreach( Component clientComponent in _clientOnlyComponents )
+            foreach( GameObject clientObject in _clientOnlyObjects )
             {
-                Destroy( clientComponent );
+                Destroy( clientObject );
             }
         }
     }
