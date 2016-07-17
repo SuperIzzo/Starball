@@ -87,7 +87,7 @@ namespace Izzo.Utility
             instance.gameObject.name = gameObject.name;
             instance.gameObject.tag = gameObject.tag;
             instance.gameObject.layer = gameObject.layer;
-            Destroy( gameObject );
+            DestroyImmediate( gameObject );
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
