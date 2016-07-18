@@ -175,6 +175,14 @@ namespace Izzo.Starball
         //..................................
         private float previousSpinInput { get; set; }
 
+        //.............................................................
+        /// <summary>  The observing camera rotation.        </summary>
+        //..................................
+        private float cameraYaw
+        {
+            get { return Camera.main.transform.rotation.eulerAngles.y; }
+        }
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         /// <summary>  UNITY CALLBACK                        </summary>
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -194,8 +202,12 @@ namespace Izzo.Starball
         [Client]
         private void HandleLocalPlayerInput()
         {
-            float x = InputManager.GetAxis("Horizontal");
-            float y = InputManager.GetAxis("Vertical");
+            float inputX = InputManager.GetAxis("Horizontal");
+            float inputY = InputManager.GetAxis("Vertical");
+            float cameraCos = Mathf.Cos( cameraYaw * Mathf.Deg2Rad );
+            float cameraSin = Mathf.Sin( cameraYaw * Mathf.Deg2Rad );
+            float x = inputX * cameraCos + inputY * cameraSin;
+            float y = inputY * cameraCos - inputX * cameraSin;
             AddToMovementInputBuffer( x, y );
 
             float spin = InputManager.GetAxis("Spin");
