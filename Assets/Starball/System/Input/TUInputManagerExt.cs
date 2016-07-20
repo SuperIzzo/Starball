@@ -308,10 +308,25 @@ namespace Izzo.Input
             _defaultPlayer4.joysticConfig,
             _defaultPlayer4.joystic );
 
-            TUInputManager.SetInputConfiguration( player1Config, TUPlayerID.One );
-            TUInputManager.SetInputConfiguration( player2Config, TUPlayerID.Two );
-            TUInputManager.SetInputConfiguration( player3Config, TUPlayerID.Three );
-            TUInputManager.SetInputConfiguration( player4Config, TUPlayerID.Four );
+            if( !string.IsNullOrEmpty( player1Config ) )
+            {
+                TUInputManager.SetInputConfiguration( player1Config, TUPlayerID.One );
+            }
+
+            if( !string.IsNullOrEmpty( player2Config ) )
+            {
+                TUInputManager.SetInputConfiguration( player2Config, TUPlayerID.Two );
+            }
+
+            if( !string.IsNullOrEmpty( player2Config ) )
+            {
+                TUInputManager.SetInputConfiguration( player3Config, TUPlayerID.Three );
+            }
+
+            if( !string.IsNullOrEmpty( player2Config ) )
+            {
+                TUInputManager.SetInputConfiguration( player4Config, TUPlayerID.Four );
+            }
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

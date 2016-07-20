@@ -653,7 +653,8 @@ namespace TeamUtility.IO
 				return;
             
             InputConfiguration inputConfig = null;
-			if(_instance._configurationTable.TryGetValue(name, out inputConfig))
+			if( !string.IsNullOrEmpty(name) && 
+                _instance._configurationTable.TryGetValue(name, out inputConfig))
 			{
                 _instance.SetInputConfigurationByPlayerID(playerID, inputConfig);
                 ResetInputConfiguration(playerID);
