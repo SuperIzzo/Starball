@@ -29,7 +29,7 @@ namespace Izzo.Networking
 #endif
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    /// <summary>  Removes components based on whether the game
+    /// <summary>  Removes behaviour based on whether the game
     ///            starts as a client or a server.       </summary>
     /// <remarks>
     ///     Clients remove all server components; 
@@ -113,6 +113,7 @@ namespace Izzo.Networking
                 if( serverStripper.isActiveAndEnabled )
                 {
                     serverStripper.StripServer();
+                    DestroyImmediate( serverStripper );
                 }
             }
         }

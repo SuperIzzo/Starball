@@ -100,8 +100,7 @@ namespace Izzo.Networking
         SyncMask _synchronize = syncAll;
 
 
-        /*******************/
-        [Header("Linear")] /********************/ 
+        [Header("Linear")]
         //-------------------------------------------------------------
         [SerializeField, Tooltip
         ( "The minimal change in position to be reported."           )]
@@ -127,8 +126,7 @@ namespace Izzo.Networking
         CompressionLevel _velocityCompression = CompressionLevel.Low;
 
 
-        /*******************/
-        [Header("Angular")] /*******************/
+        [Header("Angular")]
         //-------------------------------------------------------------
         [SerializeField, Tooltip
         ( "The minimal change in rotation to be reported (degrees)." )]

@@ -21,6 +21,7 @@
 \*+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + */
 namespace Izzo.Networking
 {
+    using System.Collections.Generic;
     using UnityEngine;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -40,13 +41,13 @@ namespace Izzo.Networking
         [SerializeField, Tooltip
         ( "A list of components that only clients should have. "     )]
         //----------------------------------        
-        private Component[] _clientOnlyComponents = null;
+        private List<Component> _clientOnlyComponents = null;
 
         //-------------------------------------------------------------
         [SerializeField, Tooltip
         ( "A list of components that only servers should have. "     )]
         //----------------------------------
-        private Component[] _serverOnlyComponents = null;
+        private List<Component> _serverOnlyComponents = null;
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         /// <summary> Removes server-only components.        </summary>
@@ -68,6 +69,38 @@ namespace Izzo.Networking
             {
                 Destroy( clientComponent );
             }
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary> Adds a client-only component to the list. </summary>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        public void AddClientOnlyComponent( Component component )
+        {
+            _clientOnlyComponents.Add( component );
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary> Adds a server-only component to the list. </summary>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        public void AddServerOnlyComponent( Component component )
+        {
+            _serverOnlyComponents.Add( component );
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary> Clears the client-only component list. </summary>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        public void ClearClientOnlyComponents()
+        {
+            _clientOnlyComponents.Clear();
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        /// <summary> Clears the server-only component list. </summary>
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        public void ClearServerOnlyComponents()
+        {
+            _serverOnlyComponents.Clear();
         }
     }
 }

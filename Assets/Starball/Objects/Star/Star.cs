@@ -21,7 +21,6 @@
 \*+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + */
 namespace Izzo.Starball
 {
-    using System;
     using UnityEngine;
     using UnityEngine.Networking;
 
